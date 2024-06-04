@@ -2,7 +2,7 @@
 
     use std::env;
 
-    use sqlx::MySqlPool;
+    use sqlx::{MySql, MySqlPool, Pool};
 
     use crate::error::error::ErrorMessage;
 
@@ -22,4 +22,12 @@
             .map_err(|e| ErrorMessage::new(&format!("Database connection error: {}", e)))?;
     
         Ok(pool_result)
+    }
+
+
+    pub async fn pool() -> Pool<MySql> {
+
+        let p: Pool<MySql> = connect().await.unwrap();
+
+        p
     }

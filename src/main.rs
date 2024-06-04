@@ -2,7 +2,7 @@
 use actix_web::middleware::Logger;
 use actix_web::{App,web, HttpServer};
 
-use rest_api::db::connect;
+use rest_api::db::pool;
 use rest_api::route;
 use rest_api::state::AppState;
 
@@ -14,10 +14,10 @@ async fn main() -> std::io::Result<()> {
         std::env::set_var("RUST_LOG", "actix_web=info");
     }
 
-    let pool = connect().await.unwrap();
+    let db_pool = pool().await;
 
     env_logger::init();
-
+    
     
     let port: u16 = 3000;
 
@@ -25,7 +25,7 @@ async fn main() -> std::io::Result<()> {
 
     HttpServer::new(move || {
         App::new()
-        .app_data(web::Data::new(AppState{  db: pool.clone() }))
+        .app_data(web::Data::new(AppState{  db: db_pool.clone() }))
         .configure(route::config)
         .wrap(Logger::default())
         
