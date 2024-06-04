@@ -1,0 +1,18 @@
+[package]
+name = "rest-api"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+actix-cors = "0.7.0"
+actix-web = "4.6.0"
+chrono = { version = "0.4.38", features = ["serde"] }
+dotenv = "0.15.0"
+env_logger = "0.11.3"
+serde = { version = "1.0.203", features = ["derive"] }
+serde_json = "1.0.117"
+sqlx = { version = "0.7", features = ["runtime-async-std-native-tls", "mysql", "chrono", "uuid"] }
+uuid = { version = "1.8.0", features = ["serde", "v4"] }
+
+[build-dependencies]
+dotenv = "0.15.0"
