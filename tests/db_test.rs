@@ -28,16 +28,48 @@ pub mod  base {
 
     use actix_web::test;
     use rest_api::db::pool;
+    use rest_api::model::Note;
     use rest_api::route::delete_note_handler;
     use rest_api::route::notes_list_handler;
     use rest_api::route::single_note_handler;
+    use rest_api::schema::CreateNoteSchema;
     use rest_api::state::AppState;
     use crate::rust_rest::index;
-    
+    use serde_json::json;
     #[actix_web::test]
     async fn api() {
         let app = test::init_service(App::new().service(index)).await;
         let req = test::TestRequest::get().uri("/").to_request();
+        let resp = test::call_service(&app, req).await;
+
+        assert!(resp.status().is_success());
+
+    }
+
+    #[actix_web::test]
+    async fn create_note() {
+
+        let db_pool = pool().await;
+        
+        let note_data = CreateNoteSchema {
+            title: String::from("Mark Browning WEE"),
+            published: Some(true),
+            content: String::from("Something mark did not realized is happing to me now"),
+            category: Some(String::from("Life"))
+        };
+
+        let app = test::init_service(
+            App::new()
+            .app_data(web::Data::new(AppState{db: db_pool.clone()}))
+            .service(single_note_handler))
+            .await;
+
+        println!("{:?} ",serde_json::to_string(&note_data));
+        let req = test::TestRequest::post()
+        .uri("/notes")
+        .set_payload(serde_json::to_string(&note_data).unwrap())
+        .to_request();
+
         let resp = test::call_service(&app, req).await;
 
         assert!(resp.status().is_success());
