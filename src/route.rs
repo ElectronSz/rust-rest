@@ -1,5 +1,5 @@
 
-use actix_web::{delete, get, patch, post, web::{self, Json, Query}, HttpResponse, Responder, Scope};
+use actix_web::{delete, web, get, patch, post, HttpResponse, Responder, Scope};
 use serde_json::json;
 use crate::{model::{Note, NoteModelResponse}, schema::{CreateNoteSchema, UpdateNoteSchema}, state::AppState};
 
@@ -227,18 +227,20 @@ fn filter_db_record(note: &Note) -> NoteModelResponse {
     }
 }
 
+#[get("/")]
+async fn index() -> impl Responder {
+    HttpResponse::Ok().body("Hello world!")
+}
+
 pub fn config(conf: &mut web::ServiceConfig) {
     let base_scope = web::scope("/api/v1")
-        .service(health_checker_handler);
-       
-
-    let note_scope: Scope = web::scope("/api/v1")
-    .service(notes_list_handler)
-    .service(create_note_handler)
-    .service(single_note_handler)
-    .service(edit_note_handler)
-    .service(delete_note_handler);
+        .service(health_checker_handler)
+        .service(index)
+        .service(notes_list_handler)
+        .service(create_note_handler)
+        .service(single_note_handler)
+        .service(edit_note_handler)
+        .service(delete_note_handler);
 
         conf.service(base_scope);
-        conf.service(note_scope);
 }

@@ -5,11 +5,9 @@ use actix_web::{App,web, HttpServer};
 use rest_api::db::connect;
 use rest_api::route;
 use rest_api::state::AppState;
-use sqlx::{Pool, MySqlPool};
-use actix_web::Result;
-use sqlx::MySql;
 
 #[actix_web::main]
+
 async fn main() -> std::io::Result<()> {
 
     if std::env::var_os("RUST_LOG").is_none() {
@@ -29,6 +27,7 @@ async fn main() -> std::io::Result<()> {
         App::new()
         .app_data(web::Data::new(AppState{  db: pool.clone() }))
         .configure(route::config)
+        .wrap(Logger::default())
         
     })
     
@@ -36,3 +35,4 @@ async fn main() -> std::io::Result<()> {
     .run()
     .await
 }
+
